@@ -9,57 +9,84 @@ import Image from "next/image";
  */
 export function FairyDust() {
     useEffect(() => {
-        const createParticle = (x: number, y: number) => {
-            const particle = document.createElement("div");
-            particle.className = "fairy-particle";
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
 
-            // Randomize starting position slightly
-            const ranX = x + (Math.random() - 0.5) * 50;
-            const ranY = y + (Math.random() - 0.5) * 50;
+        canvas.style.position = "fixed";
+        canvas.style.top = "0";
+        canvas.style.left = "0";
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+        canvas.style.pointerEvents = "none";
+        canvas.style.zIndex = "9999";
+        document.body.appendChild(canvas);
 
-            particle.style.left = `${ranX}px`;
-            particle.style.top = `${ranY}px`;
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
 
-            // Randomize size and color
-            const size = Math.random() * 6 + 2;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            particle.style.backgroundColor = Math.random() > 0.5 ? "#FFD700" : "#ffffff"; // Gold or White
-
-            document.body.appendChild(particle);
-
-            // Animate
-            const animation = particle.animate([
-                { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                { transform: `translate(${Math.random() * 100 - 50}px, -${Math.random() * 150 + 50}px) scale(0)`, opacity: 0 }
-            ], {
-                duration: Math.random() * 1500 + 1000,
-                easing: 'cubic-bezier(0, .9, .57, 1)',
-            });
-
-            animation.onfinish = () => particle.remove();
-        };
+        const particles: any[] = [];
+        let mouse = { x: -100, y: -100 };
 
         const handleMouseMove = (e: MouseEvent) => {
-            if (Math.random() > 0.8) { // Only enable sometimes to avoid clutter
-                createParticle(e.clientX, e.clientY);
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+
+            // Spawn particles on move
+            if (Math.random() > 0.5) {
+                particles.push({
+                    x: mouse.x + (Math.random() - 0.5) * 20,
+                    y: mouse.y + (Math.random() - 0.5) * 20,
+                    vx: (Math.random() - 0.5) * 1,
+                    vy: -Math.random() * 2 - 0.5, // Float up
+                    size: Math.random() * 2 + 1,
+                    life: 1,
+                    color: Math.random() > 0.6 ? "255, 215, 0" : "255, 255, 255"
+                });
             }
+        };
+
+        const animate = () => {
+            ctx.clearRect(0, 0, width, height);
+
+            for (let i = 0; i < particles.length; i++) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.02; // Smooth fade
+
+                if (p.life > 0) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(${p.color}, ${p.life})`;
+                    ctx.fill();
+
+                    // Glow
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = `rgba(${p.color}, ${p.life})`;
+                } else {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+            requestAnimationFrame(animate);
+        };
+
+        const handleResize = () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
         };
 
         window.addEventListener("mousemove", handleMouseMove);
-        return () => window.removeEventListener("mousemove", handleMouseMove);
+        window.addEventListener("resize", handleResize);
+        animate();
+
+        return () => {
+            window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("resize", handleResize);
+            canvas.remove();
+        };
     }, []);
 
-    return (
-        <style jsx global>{`
-            .fairy-particle {
-                position: fixed;
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 9999;
-                box-shadow: 0 0 10px 2px rgba(255, 215, 0, 0.5);
-                mix-blend-mode: screen;
-            }
-        `}</style>
-    );
+    return null;
 }

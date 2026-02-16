@@ -10,8 +10,8 @@ import React from "react";
 export function CinematicOverlay() {
     return (
         <div className="fixed inset-0 pointer-events-none z-[40] w-full h-full overflow-hidden">
-            {/* 1. MOVIE FILM GRAIN (More Visible) */}
-            <div className="absolute inset-0 opacity-[0.12] mix-blend-overlay pointer-events-none">
+            {/* 1. MOVIE FILM GRAIN (Subtle & Clean) */}
+            <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none">
                 <svg className='w-full h-full'>
                     <filter id='noiseFilter'>
                         <feTurbulence
@@ -25,15 +25,15 @@ export function CinematicOverlay() {
                 </svg>
             </div>
 
-            {/* 2. CINEMATIC VIGNETTE (Stronger Focus) */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.8)_100%)] mix-blend-multiply" />
+            {/* 2. CINEMATIC VIGNETTE (Soft Focus) */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_60%,rgba(0,0,0,0.5)_100%)] mix-blend-multiply" />
 
-            {/* 3. LETTERBOX BARS (Distinct) */}
-            <div className="absolute top-0 left-0 right-0 h-[10vh] bg-gradient-to-b from-black to-transparent opacity-80" />
-            <div className="absolute bottom-0 left-0 right-0 h-[10vh] bg-gradient-to-t from-black to-transparent opacity-80" />
+            {/* 3. LETTERBOX BARS (Very Subtle) */}
+            <div className="absolute top-0 left-0 right-0 h-[6vh] bg-gradient-to-b from-black to-transparent opacity-60" />
+            <div className="absolute bottom-0 left-0 right-0 h-[6vh] bg-gradient-to-t from-black to-transparent opacity-60" />
 
-            {/* 4. RGB SPLIT (Obvious Lens Effect) */}
-            <div className="absolute inset-0 opacity-30 mix-blend-screen bg-repeat animate-pulse pointer-events-none"
+            {/* 4. RGB SPLIT (Micro-detail only) */}
+            <div className="absolute inset-0 opacity-[0.05] mix-blend-screen bg-repeat pointer-events-none"
                 style={{
                     backgroundImage: 'linear-gradient(90deg, rgba(255,0,0,0.2) 1px, transparent 1px), linear-gradient(rgba(0,0,255,0.2) 1px, transparent 1px)',
                     backgroundSize: '3px 3px'
