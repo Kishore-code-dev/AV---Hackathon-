@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description: "Join the world's most premium Agentic AI hackathon. Powered by LangGraph, CrewAI & AutoGen.",
 };
 
+import { VictoryOverlay } from "@/components/ui/VictoryOverlay";
 import { AIProvider } from "@/lib/ai-context";
 
 export default async function RootLayout({
@@ -35,6 +36,7 @@ export default async function RootLayout({
         className={`${inter.className} antialiased cursor-none md:cursor-auto bg-black text-white selection:bg-yellow-500 selection:text-black font-sans`}
       >
         <AIProvider>
+          <VictoryOverlay />
           <ScrollProgress />
           <Scanline /> {/* Global HUD Scanning Effect */}
           <ReactiveParticles />
