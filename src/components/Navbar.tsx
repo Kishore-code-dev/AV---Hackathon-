@@ -52,16 +52,16 @@ export function Navbar({ user }: NavbarProps) {
             className={`fixed left-1/2 -translate-x-1/2 z-50 backdrop-blur-md transition-all duration-500 will-change-[width,transform,background]`}
         >
             <div className="flex items-center justify-between px-6 md:px-8 py-3 w-full h-full">
-                {/* Logo Area */}
-                <Link href="/" className="flex items-center gap-2 group">
+                {/* Logo Area (Interactive - No Navigation) */}
+                <div className="flex items-center gap-2 group cursor-pointer relative z-50">
                     <Logo showText={!scrolled} className={scrolled ? "scale-90 origin-left" : ""} />
                     {!scrolled && (
-                        <div className="flex items-center gap-2 ml-2 px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10">
+                        <div className="flex items-center gap-2 ml-2 px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors pointer-events-none">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Hackathon Live</span>
                         </div>
                     )}
-                </Link>
+                </div>
 
                 {/* Desktop Nav */}
                 <div className="hidden md:flex items-center gap-8 bg-white/5 px-6 py-2 rounded-full border border-white/5 backdrop-blur-lg shadow-inner">

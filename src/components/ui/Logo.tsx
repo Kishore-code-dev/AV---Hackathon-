@@ -14,14 +14,14 @@ export function Logo({ className, showText = true }: LogoProps) {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
 
-    // 🧸 Toy Physics Values for the Small Logo
+    // 💎 Precision Physics for Realistic Feel (Heavy, Industrial)
     const x = useMotionValue(0);
     const y = useMotionValue(0);
-    const rotateX = useTransform(y, [-100, 100], [60, -60]);
-    const rotateY = useTransform(x, [-100, 100], [-60, 60]);
+    const rotateX = useTransform(y, [-100, 100], [30, -30]); // Reduced rotation for weightiness
+    const rotateY = useTransform(x, [-100, 100], [-30, 30]);
 
-    // 🪀 Boing-Boing Spring Physics
-    const springConfig = { damping: 8, stiffness: 400, mass: 0.8 };
+    // 🏎️ Damped, High-Fidelity Physics
+    const springConfig = { damping: 30, stiffness: 200, mass: 2 }; // Heavier feel
     const rotateXSpring = useSpring(rotateX, springConfig);
     const rotateYSpring = useSpring(rotateY, springConfig);
 
@@ -43,8 +43,8 @@ export function Logo({ className, showText = true }: LogoProps) {
                         onDragEnd={() => setTimeout(() => setIsDragging(false), 100)} // Prevent click overlap
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => setIsHovered(false)}
-                        whileHover={{ scale: 1.2, rotate: 10 }}
-                        whileTap={{ scale: 0.9, rotate: -10 }}
+                        whileHover={{ scale: 1.05, rotate: 5, filter: "brightness(1.2)" }} // Subtle premium lift
+                        whileTap={{ scale: 0.95, rotate: -2 }}
                         style={{ x, y, rotateX: rotateXSpring, rotateY: rotateYSpring }}
                     >
                         {/* 2. The Golden Atom Engine SVG */}
