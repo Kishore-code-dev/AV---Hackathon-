@@ -17,13 +17,20 @@ export function Logo({ className, showText = true }: LogoProps) {
     // 💎 Precision Physics for Realistic Feel (Heavy, Industrial)
     const x = useMotionValue(0);
     const y = useMotionValue(0);
-    const rotateX = useTransform(y, [-100, 100], [30, -30]); // Reduced rotation for weightiness
-    const rotateY = useTransform(x, [-100, 100], [-30, 30]);
+    const rotateX = useTransform(y, [-100, 100], [45, -45]); // More dramatic rotation
+    const rotateY = useTransform(x, [-100, 100], [-45, 45]);
 
     // 🏎️ Damped, High-Fidelity Physics
-    const springConfig = { damping: 30, stiffness: 200, mass: 2 }; // Heavier feel
+    const springConfig = { damping: 20, stiffness: 300, mass: 1.5 }; // Snappier but still heavy
     const rotateXSpring = useSpring(rotateX, springConfig);
     const rotateYSpring = useSpring(rotateY, springConfig);
+
+    // ⚡ Global Event Listener for Navbar Trigger
+    useEffect(() => {
+        const handleToggle = () => setIsExpanded(true);
+        window.addEventListener('toggle-nexus', handleToggle);
+        return () => window.removeEventListener('toggle-nexus', handleToggle);
+    }, []);
 
     return (
         <>
@@ -43,8 +50,8 @@ export function Logo({ className, showText = true }: LogoProps) {
                         onDragEnd={() => setTimeout(() => setIsDragging(false), 100)} // Prevent click overlap
                         onMouseEnter={() => setIsHovered(true)}
                         onMouseLeave={() => setIsHovered(false)}
-                        whileHover={{ scale: 1.05, rotate: 5, filter: "brightness(1.2)" }} // Subtle premium lift
-                        whileTap={{ scale: 0.95, rotate: -2 }}
+                        whileHover={{ scale: 1.2, rotate: 15, filter: "brightness(1.5)" }} // MUCH More visible interaction
+                        whileTap={{ scale: 0.8 }} // Deep press
                         style={{ x, y, rotateX: rotateXSpring, rotateY: rotateYSpring }}
                     >
                         {/* 2. The Golden Atom Engine SVG */}

@@ -53,13 +53,18 @@ export function Navbar({ user }: NavbarProps) {
         >
             <div className="flex items-center justify-between px-6 md:px-8 py-3 w-full h-full">
                 {/* Logo Area (Interactive - No Navigation) */}
-                <div className="flex items-center gap-2 group cursor-pointer relative z-50">
-                    <Logo showText={!scrolled} className={scrolled ? "scale-90 origin-left" : ""} />
+                <div className="flex items-center gap-4 relative z-50">
+                    {/* The Logo triggers the HUD overlay */}
+                    <div className="cursor-pointer group" onClick={() => window.dispatchEvent(new CustomEvent('toggle-nexus'))}>
+                        <Logo showText={!scrolled} className={scrolled ? "scale-90 origin-left" : ""} />
+                    </div>
+
+                    {/* The Badge links to Home */}
                     {!scrolled && (
-                        <div className="flex items-center gap-2 ml-2 px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors pointer-events-none">
+                        <Link href="/" className="flex items-center gap-2 px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                             <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Hackathon Live</span>
-                        </div>
+                        </Link>
                     )}
                 </div>
 
