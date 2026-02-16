@@ -1,4 +1,5 @@
 "use client";
+import { useAI } from "@/lib/ai-context";
 
 import { useState, useEffect } from "react";
 import Link from 'next/link';
@@ -14,7 +15,10 @@ interface NavbarProps {
     } | null;
 }
 
+
+
 export function Navbar({ user }: NavbarProps) {
+    const { aiState, setAIState } = useAI();
     const [scrolled, setScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -36,6 +40,14 @@ export function Navbar({ user }: NavbarProps) {
         window.location.href = '/login';
     };
 
+    // DEBUG/DEMO: Toggle AI State
+    const cycleAIState = () => {
+        if (aiState === "IDLE") setAIState("THINKING");
+        else if (aiState === "THINKING") setAIState("STREAMING");
+        else if (aiState === "STREAMING") setAIState("COMPLETED");
+        else setAIState("IDLE");
+    }
+
     return (
         <motion.nav
             initial={{ y: -100 }}
@@ -49,7 +61,7 @@ export function Navbar({ user }: NavbarProps) {
                 top: scrolled ? 20 : 0
             }}
             transition={{ duration: 0.5, type: "spring", damping: 20 }}
-            className={`fixed left-1/2 -translate-x-1/2 z-50 backdrop-blur-md transition-all duration-500 will-change-[width,transform,background]`}
+            className={`fixed left-1/2 -translate-x-1/2 z-50 backdrop-blur-md transition-all duration-500 will-change-[width,transform,background] glass-nav`}
         >
             <div className="flex items-center justify-between px-6 md:px-8 py-3 w-full h-full">
                 {/* Logo Area (Interactive - No Navigation) */}
@@ -59,13 +71,20 @@ export function Navbar({ user }: NavbarProps) {
                         <Logo showText={!scrolled} className={scrolled ? "scale-90 origin-left" : ""} />
                     </div>
 
-                    {/* The Badge links to Home */}
-                    {!scrolled && (
-                        <Link href="/" className="flex items-center gap-2 px-2 py-0.5 rounded border border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 transition-colors">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">Hackathon Live</span>
-                        </Link>
-                    )}
+                    {/* AI STATUS INDICATOR (Click to cycle state) */}
+                    <button
+                        onClick={cycleAIState}
+                        className="flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 transition-all cursor-pointer group"
+                    >
+                        <span className={`w-2 h-2 rounded-full transition-colors duration-500 ${aiState === "IDLE" ? "bg-emerald-500" :
+                            aiState === "THINKING" ? "bg-amber-500 animate-pulse" :
+                                aiState === "STREAMING" ? "bg-cyan-500 animate-ping" :
+                                    "bg-purple-500"
+                            }`} />
+                        <span className="text-[10px] font-mono font-bold text-gray-400 uppercase tracking-widest group-hover:text-white transition-colors">
+                            SYSTEM: {aiState}
+                        </span>
+                    </button>
                 </div>
 
                 {/* Desktop Nav */}

@@ -1,4 +1,5 @@
 "use client";
+import { useAI } from "@/lib/ai-context";
 import { Button } from "@/components/ui/Button";
 import { SparklesCore } from "@/components/ui/Sparkles";
 import Link from 'next/link';
@@ -11,7 +12,11 @@ import { TextScramble } from "@/components/animations/TextScramble";
 import { TextShimmer } from "@/components/animations/TextShimmer";
 import { GoldenTesseract } from "@/components/three/GoldenTesseract";
 
+
+
 export function Hero() {
+    const { aiState } = useAI();
+
     return (
         <section className="hero-section min-h-screen relative flex items-center justify-center overflow-hidden bg-black">
 

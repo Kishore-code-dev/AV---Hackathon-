@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef } from "react";
+import { useAI } from "@/lib/ai-context";
 
 /**
  * "HYPER-FIELD" - 50,000 PARTICLE SIMULATION
@@ -7,8 +8,16 @@ import React, { useEffect, useRef } from "react";
  * Uses a Perlin Noise Flow Field to drive 15,000+ visible particles.
  * Visual perception of "100k" achieved through trail smearing and high-speed motion.
  */
+
 export const ReactiveParticles = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const { aiState } = useAI();
+    const aiStateRef = useRef(aiState);
+
+    // Keep ref in sync
+    useEffect(() => {
+        aiStateRef.current = aiState;
+    }, [aiState]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -45,7 +54,6 @@ export const ReactiveParticles = () => {
         };
 
         // --- CONFIGURATION ---
-        // --- CONFIGURATION ---
         const PARTICLE_COUNT = 2000; // Ultra-Optimized
         const STRIDE = 4; // x, y, age, speed
         const particles = new Float32Array(PARTICLE_COUNT * STRIDE);
@@ -75,20 +83,31 @@ export const ReactiveParticles = () => {
                 lastTime = timestamp - (deltaTime % FRAME_DURATION);
                 time += 1;
 
+                // INTELLIGENT TRAIL FADE
+                // When "THINKING", trails are longer (slower fade)
+                let fadeAlpha = 0.08;
+                if (aiStateRef.current === "THINKING") fadeAlpha = 0.02; // Long processing trails
+                if (aiStateRef.current === "STREAMING") fadeAlpha = 0.15; // Fast electric refresh
+
                 // 1. Fade previous frame (Trails) - creates the "streams"
-                ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+                ctx.fillStyle = `rgba(0, 0, 0, ${fadeAlpha})`;
                 ctx.fillRect(0, 0, width, height);
 
                 ctx.fillStyle = "#FFD700"; // GOLD
 
+                // INTELLIGENT SPEED MULTIPLIER
+                let masterSpeed = 1.0;
+                if (aiStateRef.current === "THINKING") masterSpeed = 3.0;
+                if (aiStateRef.current === "STREAMING") masterSpeed = 10.0; // Hyper speed
+
                 // 2. Update & Draw Loop
-                for (let i = 0; i < PARTICLE_COUNT; i += 2) { // Unroll slightly
+                for (let i = 0; i < PARTICLE_COUNT; i += 2) {
                     const idx = i * STRIDE;
 
                     let x = particles[idx];
                     let y = particles[idx + 1];
                     let age = particles[idx + 2];
-                    let speed = particles[idx + 3];
+                    let speed = particles[idx + 3] * masterSpeed;
 
                     // Get Noise Vector
                     const n = (noise(x * FIELD_SCALE, y * FIELD_SCALE + time * TIME_SCALE) + 1) * Math.PI; // 0 to 2PI angle
@@ -155,7 +174,8 @@ export const ReactiveParticles = () => {
             window.removeEventListener("mousemove", handleMouseMove);
             cancelAnimationFrame(animId);
         };
-    }, []);
+    }, []); // Empty dependency array to avoid re-initializing canvas
+    // aiState is accessed via aiStateRef.current inside the animate loop
 
     return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-[-1] mix-blend-screen opacity-60" />;
 };

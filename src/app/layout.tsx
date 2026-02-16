@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   description: "Join the world's most premium Agentic AI hackathon. Powered by LangGraph, CrewAI & AutoGen.",
 };
 
+import { AIProvider } from "@/lib/ai-context";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -32,16 +34,18 @@ export default async function RootLayout({
       <body
         className={`${inter.className} antialiased cursor-none md:cursor-auto bg-black text-white selection:bg-yellow-500 selection:text-black font-sans`}
       >
-        <ScrollProgress />
-        <Scanline /> {/* Global HUD Scanning Effect */}
-        <ReactiveParticles />
+        <AIProvider>
+          <ScrollProgress />
+          <Scanline /> {/* Global HUD Scanning Effect */}
+          <ReactiveParticles />
 
-        {/* <MatrixRain /> Disabled for performance */}
-        <CinematicOverlay />
-        <FairyDust />
-        <Cursor />
-        <Navbar user={user} />
-        {children}
+          {/* <MatrixRain /> Disabled for performance */}
+          <CinematicOverlay />
+          <FairyDust />
+          <Cursor />
+          <Navbar user={user} />
+          {children}
+        </AIProvider>
       </body>
     </html>
   );
