@@ -1,0 +1,271 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// === IDENTITY & ACCESS REPORT ===
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  password      String   // Hashed
+  name          String?
+  role          String   @default("PARTICIPANT") // PARTICIPANT, JUDGE, ADMIN
+  
+  // Profile & Persona
+  persona       Persona?
+  
+  // Relations
+  memberships   TeamMember[]
+  judgeAssignments JudgeAssignment[]
+  auditLogs     AuditLog[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Persona {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  
+  archetype      String?  // e.g. "Visionary Architect", "Code Sprinter"
+  skills         String?  // JSON array of skills
+  portfolioUrl   String?
+  githubHandle   String?
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// === HACKATHON CORE ===
+
+model Hackathon {
+  id            String   @id @default(uuid())
+  name          String
+  slug          String   @unique // URL friendly identifier
+  description   String?
+  
+  startDate     DateTime
+  endDate       DateTime
+  
+  status        String   @default("UPCOMING") // UPCOMING, ACTIVE, JUDGING, COMPLETED
+  
+  // Configuration
+  maxTeamSize   Int      @default(4)
+  rubric        Rubric?
+  
+  // Relations
+  projects      Project[]
+  teams         Team[]
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Rubric {
+  id            String   @id @default(uuid())
+  hackathonId   String   @unique
+  hackathon     Hackathon @relation(fields: [hackathonId], references: [id])
+  
+  items         RubricItem[]
+  
+  createdAt     DateTime @default(now())
+}
+
+model RubricItem {
+  id            String   @id @default(uuid())
+  rubricId      String
+  rubric        Rubric   @relation(fields: [rubricId], references: [id])
+  
+  label         String   // e.g. "Innovation", "Technical Complexity"
+  description   String?
+  maxPoints     Int      @default(10)
+  weight        Float    @default(1.0) // Multiplier
+  
+  scores        ScoreItem[]
+}
+
+// === TEAM & PROJECT WORKSPACE ===
+
+model Team {
+  id            String   @id @default(uuid())
+  name          String
+  joinCode      String   @unique
+  
+  hackathonId   String?
+  hackathon     Hackathon? @relation(fields: [hackathonId], references: [id])
+  
+  members       TeamMember[]
+  project       Project?
+  riskAnalyses  RiskAnalysis[]
+  
+  riskScore     Float    @default(0.0)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  teamId    String
+  team      Team     @relation(fields: [teamId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  role      String   @default("MEMBER") // LEADER, MEMBER
+  
+  joinedAt  DateTime @default(now())
+  
+  @@unique([teamId, userId])
+}
+
+model Project {
+  id            String   @id @default(uuid())
+  title         String
+  description   String?
+  track         String?
+  
+  teamId        String   @unique
+  team          Team     @relation(fields: [teamId], references: [id])
+  
+  hackathonId   String?
+  hackathon     Hackathon? @relation(fields: [hackathonId], references: [id])
+  
+  // Assets
+  githubUrl     String?
+  demoUrl       String?     // Video/Live link
+  documentation String?     // Markdown content
+  
+  status        String   @default("DRAFT") // DRAFT, SUBMITTED
+  
+  // Evaluation
+  aiReviews     AIReview[]
+  judgeScores   JudgeScore[]
+  assignments   JudgeAssignment[]
+  debates       ProjectDebate[] // Added
+  
+  // Metadata for AI
+  growthMap     GrowthMap?
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// === EVALUATION & SCORING ===
+
+model JudgeAssignment {
+  id            String   @id @default(uuid())
+  judgeId       String
+  judge         User     @relation(fields: [judgeId], references: [id])
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id])
+  
+  status        String   @default("PENDING") // PENDING, COMPLETED
+  
+  assignedAt    DateTime @default(now())
+  completedAt   DateTime?
+  
+  @@unique([judgeId, projectId])
+}
+
+model JudgeScore {
+  id            String   @id @default(uuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id])
+  
+  judgeId       String
+  // Relation to User assumed via JudgeAssignment, simplified here for direct access logic
+  
+  items         ScoreItem[]
+  feedback      String?
+  
+  totalScore    Float    @default(0.0)
+  isLocked      Boolean  @default(false)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ScoreItem {
+  id            String   @id @default(uuid())
+  judgeScoreId  String
+  judgeScore    JudgeScore @relation(fields: [judgeScoreId], references: [id])
+  
+  rubricItemId  String
+  rubricItem    RubricItem @relation(fields: [rubricItemId], references: [id])
+  
+  score         Int      // The actual score given
+}
+
+// === AI & INTELLIGENCE LAYERS ===
+
+model AIReview {
+  id            String   @id @default(uuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id])
+  
+  agentName     String   // e.g. "Security Auditor", "UX Critic"
+  score         Float
+  reasoning     String   // Markdown
+  
+  createdAt     DateTime @default(now())
+}
+
+model GrowthMap {
+  id            String   @id @default(uuid())
+  projectId     String   @unique
+  project       Project  @relation(fields: [projectId], references: [id])
+  
+  marketFitScore Float
+  executionPlan  String // JSON
+  
+  generatedAt   DateTime @default(now())
+}
+
+model ProjectDebate {
+  id            String   @id @default(uuid())
+  projectId     String
+  project       Project  @relation(fields: [projectId], references: [id])
+  
+  topic         String
+  transcript    String   // JSON
+  consensus     String?
+  
+  createdAt     DateTime @default(now())
+}
+
+model RiskAnalysis {
+  id            String   @id @default(uuid())
+  teamId        String
+  team          Team     @relation(fields: [teamId], references: [id])
+  
+  riskScore     Float
+  riskLevel     String
+  failureFactors String  // JSON
+  
+  createdAt     DateTime @default(now())
+}
+
+// === SECURITY & AUDIT ===
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  action        String   // e.g. "PROJECT_SUBMIT", "SCORE_UPDATE"
+  actorId       String?
+  actor         User?    @relation(fields: [actorId], references: [id])
+  
+  targetId      String?  // ID of the affected entity
+  details       String?  // JSON diff or metadata
+  
+  ipAddress     String?
+  userAgent     String?
+  
+  createdAt     DateTime @default(now())
+}
