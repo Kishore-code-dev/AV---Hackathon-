@@ -129,7 +129,7 @@ function NeuralCore() {
 export function GoldenTesseract() {
     return (
         <div className="absolute inset-0 z-0 opacity-100 pointer-events-none transition-opacity duration-1000">
-            <Canvas dpr={[1, 2]} gl={{ antialias: true, alpha: true }}>
+            <Canvas dpr={[1, 1]} gl={{ antialias: false, alpha: true, powerPreference: "high-performance" }}>
                 <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={50} />
 
                 <ambientLight intensity={0.5} />
@@ -139,7 +139,7 @@ export function GoldenTesseract() {
                 </Float>
 
                 {/* Stars in background for depth */}
-                <Stars radius={100} depth={50} count={2000} factor={4} saturation={0} fade speed={0.5} />
+                <Stars radius={100} depth={50} count={500} factor={4} saturation={0} fade speed={0.5} />
 
                 {/* Subtle fog for depth blending */}
                 <fog attach="fog" args={['#000000', 5, 20]} />

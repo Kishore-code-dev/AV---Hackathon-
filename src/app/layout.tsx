@@ -32,7 +32,8 @@ export default async function RootLayout({
         <ScrollProgress />
         <Scanline /> {/* Global HUD Scanning Effect */}
         <ReactiveParticles />
-        <MatrixRain />
+
+        {/* <MatrixRain /> Disabled for performance */}
         <Cursor />
         <Navbar user={user} />
         {children}

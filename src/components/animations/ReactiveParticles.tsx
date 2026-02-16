@@ -45,13 +45,14 @@ export const ReactiveParticles = () => {
         };
 
         // --- CONFIGURATION ---
-        const PARTICLE_COUNT = 4000; // Performance optimized for smoother UX
+        // --- CONFIGURATION ---
+        const PARTICLE_COUNT = 2000; // Ultra-Optimized
         const STRIDE = 4; // x, y, age, speed
         const particles = new Float32Array(PARTICLE_COUNT * STRIDE);
         const FIELD_SCALE = 0.002;
         const TIME_SCALE = 0.0001;
 
-        // Init Paticles
+        // Init Particles
         for (let i = 0; i < PARTICLE_COUNT; i++) {
             const idx = i * STRIDE;
             particles[idx] = Math.random() * width;
@@ -61,67 +62,76 @@ export const ReactiveParticles = () => {
         }
 
         let time = 0;
+        let lastTime = 0;
+        const FPS_LIMIT = 30; // Cap at 30fps for smoothness
+        const FRAME_DURATION = 1000 / FPS_LIMIT;
+
         let mouse = { x: -1000, y: -1000 };
 
-        const animate = () => {
-            time += 1;
+        const animate = (timestamp: number) => {
+            const deltaTime = timestamp - lastTime;
 
-            // 1. Fade previous frame (Trails) - creates the "streams"
-            ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
-            ctx.fillRect(0, 0, width, height);
+            if (deltaTime >= FRAME_DURATION) {
+                lastTime = timestamp - (deltaTime % FRAME_DURATION);
+                time += 1;
 
-            ctx.fillStyle = "#FFD700"; // GOLD
+                // 1. Fade previous frame (Trails) - creates the "streams"
+                ctx.fillStyle = "rgba(0, 0, 0, 0.08)";
+                ctx.fillRect(0, 0, width, height);
 
-            // 2. Update & Draw Loop
-            for (let i = 0; i < PARTICLE_COUNT; i += 2) { // Unroll slightly
-                const idx = i * STRIDE;
+                ctx.fillStyle = "#FFD700"; // GOLD
 
-                let x = particles[idx];
-                let y = particles[idx + 1];
-                let age = particles[idx + 2];
-                let speed = particles[idx + 3];
+                // 2. Update & Draw Loop
+                for (let i = 0; i < PARTICLE_COUNT; i += 2) { // Unroll slightly
+                    const idx = i * STRIDE;
 
-                // Get Noise Vector
-                const n = (noise(x * FIELD_SCALE, y * FIELD_SCALE + time * TIME_SCALE) + 1) * Math.PI; // 0 to 2PI angle
+                    let x = particles[idx];
+                    let y = particles[idx + 1];
+                    let age = particles[idx + 2];
+                    let speed = particles[idx + 3];
 
-                // Add velocity based on noise angle
-                let vx = Math.cos(n) * speed;
-                let vy = Math.sin(n) * speed;
+                    // Get Noise Vector
+                    const n = (noise(x * FIELD_SCALE, y * FIELD_SCALE + time * TIME_SCALE) + 1) * Math.PI; // 0 to 2PI angle
 
-                // Mouse Repulsion / Vortex
-                const dx = x - mouse.x;
-                const dy = y - mouse.y;
-                const distSq = dx * dx + dy * dy;
-                if (distSq < 100000) {
-                    const f = (100000 - distSq) / 100000;
-                    vx += (dx / Math.sqrt(distSq)) * f * 5;
-                    vy += (dy / Math.sqrt(distSq)) * f * 5;
+                    // Add velocity based on noise angle
+                    let vx = Math.cos(n) * speed;
+                    let vy = Math.sin(n) * speed;
+
+                    // Mouse Repulsion / Vortex
+                    const dx = x - mouse.x;
+                    const dy = y - mouse.y;
+                    const distSq = dx * dx + dy * dy;
+                    if (distSq < 100000) {
+                        const f = (100000 - distSq) / 100000;
+                        vx += (dx / Math.sqrt(distSq)) * f * 5;
+                        vy += (dy / Math.sqrt(distSq)) * f * 5;
+                    }
+
+                    x += vx;
+                    y += vy;
+                    age += 1;
+
+                    // Screen Wrap & Respawn
+                    if (x < 0 || x > width || y < 0 || y > height || age > 200 + Math.random() * 100) {
+                        x = Math.random() * width;
+                        y = Math.random() * height;
+                        age = 0;
+                    }
+
+                    particles[idx] = x;
+                    particles[idx + 1] = y;
+                    particles[idx + 2] = age;
+
+                    // Render 1px dot
+                    // Optimization: Draw direct pixel or tiny rect. Rect is safer for browser scaling.
+                    // Variation: Some particles are brighter
+                    if (Math.random() > 0.8) {
+                        ctx.fillRect(x, y, 1.5, 1.5);
+                    } else {
+                        ctx.fillRect(x, y, 1, 1);
+                    }
                 }
-
-                x += vx;
-                y += vy;
-                age += 1;
-
-                // Screen Wrap & Respawn
-                if (x < 0 || x > width || y < 0 || y > height || age > 200 + Math.random() * 100) {
-                    x = Math.random() * width;
-                    y = Math.random() * height;
-                    age = 0;
-                }
-
-                particles[idx] = x;
-                particles[idx + 1] = y;
-                particles[idx + 2] = age;
-
-                // Render 1px dot
-                // Optimization: Draw direct pixel or tiny rect. Rect is safer for browser scaling.
-                // Variation: Some particles are brighter
-                if (Math.random() > 0.8) {
-                    ctx.fillRect(x, y, 1.5, 1.5);
-                } else {
-                    ctx.fillRect(x, y, 1, 1);
-                }
-            }
+            } // End of FPS limit check
 
             requestAnimationFrame(animate);
         };
