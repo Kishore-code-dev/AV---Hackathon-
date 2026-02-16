@@ -10,6 +10,31 @@ import * as THREE from 'three';
  * It represents the complexity and interconnectivity of AI Agents.
  */
 
+/**
+ * CINEMATIC CAMERA SYSTEM
+ * Creates a slow, "dolly" like movement based on mouse position but damped heavily
+ * to feel like a heavy film camera crane.
+ */
+function CameraRig() {
+    useFrame((state) => {
+        // Look at center
+        state.camera.lookAt(0, 0, 0);
+
+        // Gentle "breathing" zoom
+        const time = state.clock.getElapsedTime();
+        state.camera.position.z = 10 + Math.sin(time * 0.5) * 0.5;
+
+        // Very subtle parallax based on mouse
+        // We use state.pointer instead of raw mouse for correct coordinate space (-1 to 1)
+        const x = state.pointer.x * 2; // Range
+        const y = state.pointer.y * 2;
+
+        state.camera.position.x += (x - state.camera.position.x) * 0.05; // 5% lerp
+        state.camera.position.y += (y - state.camera.position.y) * 0.05;
+    })
+    return null;
+}
+
 function NeuralCore() {
     const meshRef = useRef<THREE.Group>(null);
     const outerRingRef = useRef<THREE.Mesh>(null);
@@ -134,9 +159,8 @@ export function GoldenTesseract() {
 
                 <ambientLight intensity={0.5} />
 
-                <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
-                    <NeuralCore />
-                </Float>
+                <CameraRig />
+                <NeuralCore />
 
                 {/* Stars in background for depth */}
                 <Stars radius={100} depth={50} count={500} factor={4} saturation={0} fade speed={0.5} />

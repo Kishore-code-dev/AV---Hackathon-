@@ -9,6 +9,8 @@ import { Scanline } from "@/components/ui/Scanline"; // Added Scanline
 import { Navbar } from "@/components/Navbar";
 import { getCurrentUser } from "@/lib/auth";
 
+import { CinematicOverlay } from "@/components/ui/CinematicOverlay";
+
 import { Inter } from "next/font/google"; // Fallback to a standard font or just use system fonts if this fails too. Actually, let's just use a standard one.
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,6 +36,7 @@ export default async function RootLayout({
         <ReactiveParticles />
 
         {/* <MatrixRain /> Disabled for performance */}
+        <CinematicOverlay />
         <Cursor />
         <Navbar user={user} />
         {children}
