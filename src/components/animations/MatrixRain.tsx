@@ -35,7 +35,7 @@ export function MatrixRain() {
             }
         };
 
-        const interval = setInterval(draw, 33);
+        const interval = setInterval(draw, 50);
         const handleResize = () => {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;

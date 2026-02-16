@@ -7,7 +7,7 @@ import * as THREE from 'three';
 function NeuralNetwork() {
     const pointsRef = useRef<THREE.Points>(null!);
     const linesRef = useRef<any>(null!); // For the connecting lines
-    const count = 200; // Reduced count for performance with lines
+    const count = 120; // Reduced count for performance with lines
 
     // Generate random points in a sphere
     const { positions, linePositions } = useMemo(() => {

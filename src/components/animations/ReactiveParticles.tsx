@@ -45,7 +45,7 @@ export const ReactiveParticles = () => {
         };
 
         // --- CONFIGURATION ---
-        const PARTICLE_COUNT = 15000; // Real count. Visually looks like 100k+ with trails.
+        const PARTICLE_COUNT = 4000; // Performance optimized for smoother UX
         const STRIDE = 4; // x, y, age, speed
         const particles = new Float32Array(PARTICLE_COUNT * STRIDE);
         const FIELD_SCALE = 0.002;
