@@ -10,6 +10,7 @@ import { Navbar } from "@/components/Navbar";
 import { getCurrentUser } from "@/lib/auth";
 
 import { CinematicOverlay } from "@/components/ui/CinematicOverlay";
+import { FairyDust } from "@/components/animations/FairyDust";
 
 import { Inter } from "next/font/google"; // Fallback to a standard font or just use system fonts if this fails too. Actually, let's just use a standard one.
 const inter = Inter({ subsets: ["latin"] });
@@ -37,6 +38,7 @@ export default async function RootLayout({
 
         {/* <MatrixRain /> Disabled for performance */}
         <CinematicOverlay />
+        <FairyDust />
         <Cursor />
         <Navbar user={user} />
         {children}

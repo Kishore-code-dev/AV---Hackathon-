@@ -10,8 +10,8 @@ import React from "react";
 export function CinematicOverlay() {
     return (
         <div className="fixed inset-0 pointer-events-none z-[40] w-full h-full overflow-hidden">
-            {/* 1. MOVIE FILM GRAIN (Animated via CSS) */}
-            <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay">
+            {/* 1. MOVIE FILM GRAIN (More Visible) */}
+            <div className="absolute inset-0 opacity-[0.12] mix-blend-overlay pointer-events-none">
                 <svg className='w-full h-full'>
                     <filter id='noiseFilter'>
                         <feTurbulence
@@ -25,20 +25,18 @@ export function CinematicOverlay() {
                 </svg>
             </div>
 
-            {/* 2. CINEMATIC VIGNETTE (Focus Center) */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_50%,rgba(0,0,0,0.6)_100%)]" />
+            {/* 2. CINEMATIC VIGNETTE (Stronger Focus) */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_40%,rgba(0,0,0,0.8)_100%)] mix-blend-multiply" />
 
-            {/* 3. LETTERBOX BARS (Subtle 2.35:1 Aspect Ratio Hint) */}
-            {/* We don't fully block the screen, just a subtle gradient hint at top/bottom */}
-            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black/60 to-transparent" />
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/60 to-transparent" />
+            {/* 3. LETTERBOX BARS (Distinct) */}
+            <div className="absolute top-0 left-0 right-0 h-[10vh] bg-gradient-to-b from-black to-transparent opacity-80" />
+            <div className="absolute bottom-0 left-0 right-0 h-[10vh] bg-gradient-to-t from-black to-transparent opacity-80" />
 
-            {/* 4. SUBTLE RGB SPLIT (Chromatic Aberration on edges) */}
-            {/* Creates that "shot on lens" look */}
-            <div className="absolute inset-0 opacity-10 mix-blend-screen bg-repeat animate-pulse"
+            {/* 4. RGB SPLIT (Obvious Lens Effect) */}
+            <div className="absolute inset-0 opacity-30 mix-blend-screen bg-repeat animate-pulse pointer-events-none"
                 style={{
-                    backgroundImage: 'linear-gradient(90deg, rgba(255,0,0,0.1) 1px, transparent 1px), linear-gradient(rgba(0,0,255,0.1) 1px, transparent 1px)',
-                    backgroundSize: '4px 4px'
+                    backgroundImage: 'linear-gradient(90deg, rgba(255,0,0,0.2) 1px, transparent 1px), linear-gradient(rgba(0,0,255,0.2) 1px, transparent 1px)',
+                    backgroundSize: '3px 3px'
                 }}
             />
         </div>
